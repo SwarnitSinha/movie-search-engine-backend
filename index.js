@@ -128,6 +128,94 @@ app.post('/signup',async(req,res)=>{
 
 })
 
+app.post('/saveMovie', async(req,res)=>{
+    // console.log(req.body);
+    // console.log(req.headers.token)
+    //verify the token
+    try {
+        const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
+        // console.log(result)
+
+        const user = await User.findOne({_id:result._id})
+        const movie = {
+            id:req.body.id,
+            title:req.body.title,
+            rating:req.body.rating,
+            genre:req.body.genre
+        }
+        user.likedMovie.push(movie);
+        await user.save();
+        res.json({
+            status:"success",
+            data:user.likedMovie,
+            error:null
+        })
+            
+    } catch (err) {
+        console.log(err);
+        res.json({
+            status:"Failed",
+            message:"Internal Server Error",
+            data:null,
+            error:error
+        })
+    }
+    // find user by this result
+})
+
+app.delete('/delMovie', async(req,res)=>{
+    try {
+        const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
+        console.log("anything");
+        const user = await User.findOne({_id:result._id});
+        // console.log(user);
+
+        // del movie in user's movie list by checking id
+        const movieIndex = await user.likedMovie.findIndex((item)=>item.id===req.body.movieId)
+        console.log(user.likedMovie.length);
+        
+        await user.likedMovie.splice(movieIndex,1);
+        await user.save();
+        console.log(user.likedMovie.length);
+        res.json({
+            message:"del",
+            error:null
+        })
+
+    } catch (error) {
+        res.json({
+            message:"Error happend",
+            error:error
+        })
+    }
+    
+})
+
+app.get('/getLikedMovies', async(req,res)=>{
+    
+    try {
+        console.log("called")
+        const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
+        const user = await User.findOne({_id:result._id});
+        res.json({
+            status:"Success",
+            message:"Liked Movies found",
+            data: user.likedMovie,
+            error:null
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            status:"Failed",
+            message:"Internal Server Error",
+            data:null,
+            error:error
+        })
+    }
+    
+})
+
+
 db.connect();
 const port = process.env.PORT || 5000;
 app.listen(port,(req,res)=>{

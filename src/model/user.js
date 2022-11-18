@@ -26,7 +26,9 @@ const userSchema = new mongoose.Schema({
             id:Number,
             title: String,
             rating: Number,
-            genre: String
+            genre:[
+                
+            ]
         }
     ]
 })

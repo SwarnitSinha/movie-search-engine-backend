@@ -11,8 +11,9 @@ const sendVerificationMail = async (email,username)=>{
         const link = "http://localhost:5000/api/mailVerification?token="+token
 
         await sendEmail(email,username,link,"OTP-Verification for Movie-Search-Engine");
-
+        
         return;
+
     } catch (error) {
         console.log("Error occurred : ", error);
         return;
