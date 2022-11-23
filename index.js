@@ -127,14 +127,42 @@ app.post('/signup',async(req,res)=>{
     }
 
 })
-
+app.put('/changePassword',async (req,res)=>{
+    try {
+        console.log("pasword change clicked")
+        console.log(req.headers.token);
+        const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
+        const user = await User.findOne({_id:result._id});
+        const passCorrect = await verifyPass(req.body.oldPass,user.password)
+        if(passCorrect){
+            //update user with new password
+            user.password = await genHashPass(req.body.newPass);
+        }
+        user.save();
+        res.json({
+            message:"Password has been changed",
+            status:"Success",
+            error:null,
+            success_code:200
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.json({
+            message:"Internal error",
+            status:"Failed",
+            error:error,
+            success_code:500
+        })
+    }
+})
 app.post('/saveMovie', async(req,res)=>{
     // console.log(req.body);
     // console.log(req.headers.token)
     //verify the token
     try {
+        console.log("while saving : ",req.headers.token);
         const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
-        // console.log(result)
 
         const user = await User.findOne({_id:result._id})
         const movie = {
@@ -194,7 +222,8 @@ app.delete('/delMovie', async(req,res)=>{
 app.get('/getLikedMovies', async(req,res)=>{
     
     try {
-        console.log("called")
+        console.log("token",req.headers.token)
+        if(!req.headers.token)return res.json({data:null})
         const result = await jwt.verify(req.headers.token,process.env.JWT_SECRET);
         const user = await User.findOne({_id:result._id});
         res.json({
@@ -204,7 +233,7 @@ app.get('/getLikedMovies', async(req,res)=>{
             error:null
         })
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.json({
             status:"Failed",
             message:"Internal Server Error",
