@@ -12,8 +12,6 @@ app.use(express.json())
 //import from files
 const {verifyPass, genHashPass} = require('./src/utils/password')
 const {sendVerificationMail} = require('./src/utils/mail/mailer');
-const { JWT } = require('google-auth-library');
-
 
 
 app.get('/',(req,res)=>{
