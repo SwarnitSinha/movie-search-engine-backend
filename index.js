@@ -251,6 +251,8 @@ app.listen(port,(req,res)=>{
     console.log("server is running at 5000");
 })
 
+module.exports = app;
+
 // echo "# movie-search-engine-backend" >> README.md
 // git init
 // git add README.md
